@@ -145,6 +145,12 @@ public class ListaAlunosActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.enviar_notas)
             new EnviaDadosServidor(this).execute();
 
+        if(item.getItemId() == R.id.menu_baixar_provas){
+            Intent intentVaiParaProvas = new Intent(this, ProvasActivity.class);
+            startActivity(intentVaiParaProvas);
+
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
