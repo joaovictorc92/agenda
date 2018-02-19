@@ -1,14 +1,12 @@
 package br.com.alura.agenda;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -16,6 +14,8 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+
+import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 
 /**
  * Created by Desenvolvimento on 14/02/2018.
@@ -25,6 +25,7 @@ public class Localizador implements GoogleApiClient.ConnectionCallbacks, Locatio
 
     private final GoogleMap mapa;
     private GoogleApiClient client;
+    private Context context;
 
     public Localizador(Context context, GoogleMap mapa) {
          client = new GoogleApiClient.Builder(context)
@@ -33,7 +34,9 @@ public class Localizador implements GoogleApiClient.ConnectionCallbacks, Locatio
                 .build();
         client.connect();
         this.mapa = mapa;
+        this.context = context;
     }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -41,10 +44,12 @@ public class Localizador implements GoogleApiClient.ConnectionCallbacks, Locatio
         request.setSmallestDisplacement(50);
         request.setInterval(1000);
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        //LocationServices.get
-        //FusedLocationProviderApi
-       // PendingResult<Status> statusPendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(client, request, this);
+        if (checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(context,android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            //LocationServices.get
+            //FusedLocationProviderApi
+            LocationServices.FusedLocationApi.requestLocationUpdates(client, request, this);
+        }
     }
 
 
