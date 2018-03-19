@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +22,10 @@ import java.io.File;
 
 import br.com.alura.agenda.dao.AlunoDAO;
 import br.com.alura.agenda.modelo.Aluno;
+import br.com.alura.agenda.retrofit.RetrofitInicializador;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FormularioActivity extends AppCompatActivity {
 
@@ -85,6 +90,20 @@ public class FormularioActivity extends AppCompatActivity {
                     dao.insere(aluno);
                 }
                 dao.close();
+
+               /* new InsereAlunoTask(aluno).execute();*/
+                Call<Void> call = new RetrofitInicializador().getAlunoService().insere(aluno);
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        Log.i("onResponse", "requisicao com sucesso");
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Log.e("onFailure", "requisicao falhou");
+                    }
+                });
 
                 Toast.makeText(FormularioActivity.this, "Aluno " + aluno.getNome() + " salvo!", Toast.LENGTH_SHORT).show();
 
