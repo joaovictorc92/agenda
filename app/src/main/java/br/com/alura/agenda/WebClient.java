@@ -43,7 +43,7 @@ public class WebClient {
         }
     }
 
-    /*public void insere(String json){
+    /*public void sincroniza(String json){
         String endereco = "http://192.168.1.8:8080/api/aluno";
         realizaRequisicao(json, endereco);
     }*/

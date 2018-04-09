@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import br.com.alura.agenda.ListaAlunosActivity;
 import br.com.alura.agenda.R;
 import br.com.alura.agenda.modelo.Aluno;
 
@@ -40,7 +39,7 @@ public class AlunosAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return alunos.get(position).getId();
+        return 1;
     }
 
     @Override
