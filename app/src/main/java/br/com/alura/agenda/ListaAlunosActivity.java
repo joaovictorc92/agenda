@@ -18,11 +18,16 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import br.com.alura.agenda.adapter.AlunosAdapter;
 import br.com.alura.agenda.dao.AlunoDAO;
 import br.com.alura.agenda.dto.AlunoSync;
+import br.com.alura.agenda.event.AtualizaListaAlunoEvent;
 import br.com.alura.agenda.modelo.Aluno;
 import br.com.alura.agenda.retrofit.RetrofitInicializador;
 import retrofit2.Call;
@@ -33,11 +38,16 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     private ListView listaAlunos;
     private SwipeRefreshLayout swipe;
+    private EventBus eventBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
+
+        eventBus = EventBus.getDefault();
+        if (!eventBus.isRegistered(this))
+            eventBus.register(this);
 
         listaAlunos = (ListView) findViewById(R.id.lista_alunos);
 
@@ -76,6 +86,17 @@ public class ListaAlunosActivity extends AppCompatActivity {
         registerForContextMenu(listaAlunos);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void atualizaListaAlunoEvent(AtualizaListaAlunoEvent event) {
+        carregaLista();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        eventBus.unregister(this);
+    }
+
     private void carregaLista() {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.buscaAlunos();
@@ -102,7 +123,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
                 AlunoSync alunoSync = response.body();
-                AlunoDAO dao = new AlunoDAO( ListaAlunosActivity.this);
+                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
                 dao.sincroniza(alunoSync.getAlunos());
                 dao.close();
                 carregaLista();
@@ -198,12 +219,12 @@ public class ListaAlunosActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.enviar_notas)
             new EnviaDadosServidor(this).execute();
 
-        if(item.getItemId() == R.id.menu_baixar_provas){
+        if (item.getItemId() == R.id.menu_baixar_provas) {
             Intent intentVaiParaProvas = new Intent(this, ProvasActivity.class);
             startActivity(intentVaiParaProvas);
         }
 
-        if(item.getItemId() == R.id.menu_mapa){
+        if (item.getItemId() == R.id.menu_mapa) {
             Intent vaiParaMapa = new Intent(this, MapaActivity.class);
             startActivity(vaiParaMapa);
         }
